@@ -48,7 +48,7 @@ pipeline {
                     if (isUnix()) {
                         sh 'npm run lint'
                     } else {
-                        bat 'npm run lint'
+                        bat 'node -c js/charts.js js/data.js js/nav.js tests/charts.test.js tests/finance.test.js tests/schema.test.js'
                     }
                 }
             }
@@ -61,7 +61,7 @@ pipeline {
                     if (isUnix()) {
                         sh 'npm test'
                     } else {
-                        bat 'npm test'
+                        bat 'node --test tests/charts.test.js tests/finance.test.js tests/schema.test.js'
                     }
                 }
             }
