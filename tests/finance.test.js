@@ -76,5 +76,14 @@ test("Financial Calculations & Metrics Suite", async (t) => {
       assert.ok(budget[i] > 0, `${labels[i]} budget must be positive`);
     }
   });
+
+  await t.test("Budget guardrails: monthly spending does not exceed monthly income", () => {
+    const { income, expenses } = TWINFIN_DATA.cashflow;
+    const avgIncome = income.reduce((a, b) => a + b, 0) / income.length;
+    const avgExpenses = expenses.reduce((a, b) => a + b, 0) / expenses.length;
+    assert.ok(avgIncome > avgExpenses, "Average income must safely surpass average monthly expenditures");
+    const savingsRatio = (avgIncome - avgExpenses) / avgIncome;
+    assert.ok(savingsRatio >= 0.20, "Savings ratio must be at least 20% to satisfy budget guardrail");
+  });
 });
 
