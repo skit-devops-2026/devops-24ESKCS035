@@ -66,6 +66,19 @@ pipeline {
                 }
             }
         }
+
+        stage('Package Release') {
+            steps {
+                echo 'Packaging clean distribution artifact...'
+                script {
+                    if (isUnix()) {
+                        sh 'tar -czf twinfin-release.tar.gz --exclude=".git" --exclude=".github" *.html css js tests package.json Makefile README.md'
+                    } else {
+                        bat 'tar -czf twinfin-release.tar.gz --exclude=".git" --exclude=".github" *.html css js tests package.json Makefile README.md'
+                    }
+                }
+            }
+        }
     }
 
     post {
