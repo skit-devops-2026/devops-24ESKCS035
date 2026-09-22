@@ -1,5 +1,5 @@
 {
-  "name": "devops-24eskcs004-digital-twin",
+  "name": "devops-24eskcs035-digital-twin",
   "version": "1.0.0",
   "description": "Digital Twin for Personal Finance - SKIT DevOps 2026 Assessment MT1",
   "main": "js/data.js",
@@ -15,6 +15,6 @@
     "jenkins",
     "github-actions"
   ],
-  "author": "Aashi Goyal <aashigoyal7002@gmail.com>",
+  "author": "Akshay Agrawal <akshayagrawal168@gmail.com>",
   "license": "MIT"
 }
