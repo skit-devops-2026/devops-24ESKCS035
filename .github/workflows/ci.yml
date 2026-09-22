@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - 'feature/**'
+      - 'feature/*'
   pull_request:
     branches:
       - main
@@ -56,7 +57,9 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Execute Automated Unit Tests
-        run: npm test
+        run: |
+          echo "Running unit test suite with Node $(node -v)..."
+          npm test
 
       - name: Publish Test Summary
         if: always()
