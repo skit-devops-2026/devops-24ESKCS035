@@ -57,4 +57,24 @@ test("Financial Calculations & Metrics Suite", async (t) => {
     assert.ok(emergencyFund, "Emergency Fund metric must exist");
     assert.ok(emergencyFund.value >= 80, "Emergency fund score must achieve baseline threshold of 80");
   });
+
+  await t.test("Savings allocation percentages sum exactly to 100%", () => {
+    const allocations = TWINFIN_DATA.savingsAllocation;
+    assert.ok(Array.isArray(allocations), "Savings allocation must be an array");
+    const totalPct = allocations.reduce((sum, item) => sum + item.pct, 0);
+    assert.equal(totalPct, 100, "Savings allocation percentages must total 100%");
+    const totalAmount = allocations.reduce((sum, item) => sum + item.amount, 0);
+    assert.ok(totalAmount > 1000, "Total allocated savings amount should exceed $1000");
+  });
+
+  await t.test("Spending category actual vs budget arrays align properly", () => {
+    const { labels, actual, budget } = TWINFIN_DATA.spendingByCategory;
+    assert.equal(labels.length, actual.length, "Actual spending items must match category labels");
+    assert.equal(labels.length, budget.length, "Budget items must match category labels");
+    for (let i = 0; i < actual.length; i++) {
+      assert.ok(actual[i] >= 0, `${labels[i]} actual spend must be non-negative`);
+      assert.ok(budget[i] > 0, `${labels[i]} budget must be positive`);
+    }
+  });
 });
+
