@@ -11,10 +11,8 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   packages: write
-  pages: write
-  id-token: write
 
 jobs:
   hygiene:
@@ -89,26 +87,17 @@ jobs:
             ghcr.io/skit-devops-2026/devops-24eskcs035:latest
             ghcr.io/skit-devops-2026/devops-24eskcs035:sha-${{ github.sha }}
 
-  deploy-pages:
-    name: Deploy to GitHub Pages (Live URL)
+  deploy:
+    name: Deploy to GitHub Pages
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: build-and-test
+    needs: docker
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to GitHub Pages Branch
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: .
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .
