@@ -1,0 +1,13 @@
+.git
+.github
+.github copy
+.vscode
+node_modules
+tests
+monitoring
+docs
+k8s
+Jenkinsfile
+Makefile
+scripts
+*.md
