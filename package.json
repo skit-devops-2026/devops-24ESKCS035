@@ -1,0 +1,20 @@
+{
+  "name": "devops-24eskcs035-digital-twin",
+  "version": "1.0.0",
+  "description": "Digital Twin for Personal Finance - SKIT DevOps 2026 Assessment MT1",
+  "main": "js/data.js",
+  "scripts": {
+    "test": "node --test tests/charts.test.js tests/finance.test.js tests/schema.test.js",
+    "lint": "node -c js/charts.js js/data.js js/nav.js tests/charts.test.js tests/finance.test.js tests/schema.test.js"
+  },
+  "keywords": [
+    "devops",
+    "personal-finance",
+    "skit",
+    "ci-cd",
+    "jenkins",
+    "github-actions"
+  ],
+  "author": "Akshay Agrawal <akshayagrawal168@gmail.com>",
+  "license": "MIT"
+}

@@ -1,0 +1,89 @@
+const test = require("node:test");
+const assert = require("node:assert/strict");
+const { TWINFIN_DATA, fmtMoney } = require("../js/data.js");
+
+test("Financial Calculations & Metrics Suite", async (t) => {
+  await t.test("fmtMoney formats currency correctly", () => {
+    assert.equal(fmtMoney(1250), "$1,250.00");
+    assert.equal(fmtMoney(1250, { decimals: false }), "$1,250");
+    assert.equal(fmtMoney(-500), "-$500.00");
+    assert.equal(fmtMoney(500, { forcePlus: true }), "+$500.00");
+    assert.equal(fmtMoney(0), "$0.00");
+  });
+
+  await t.test("Net worth has positive trajectory and matching data points", () => {
+    const { labels, values } = TWINFIN_DATA.netWorth;
+    assert.equal(labels.length, values.length, "Labels and values length must match");
+    assert.ok(values.length >= 6, "Must have at least 6 months of net worth history");
+    const latest = values[values.length - 1];
+    const initial = values[0];
+    assert.ok(latest > initial, "Overall net worth must show positive growth");
+    assert.equal(latest, 42180, "Latest net worth must match current records");
+  });
+
+  await t.test("Cashflow income consistently covers expenses", () => {
+    const { income, expenses } = TWINFIN_DATA.cashflow;
+    assert.equal(income.length, expenses.length, "Income and expense months must match");
+    for (let i = 0; i < income.length; i++) {
+      const netSavings = income[i] - expenses[i];
+      assert.ok(netSavings > 0, `Month ${i} net cashflow must be positive`);
+    }
+  });
+
+  await t.test("September category breakdown totals match expected proportion", () => {
+    const breakdown = TWINFIN_DATA.septemberBreakdown;
+    assert.ok(Array.isArray(breakdown), "Breakdown must be an array");
+    const totalPct = breakdown.reduce((sum, item) => sum + item.pct, 0);
+    assert.ok(totalPct >= 95 && totalPct <= 100, "Percentage sum should account for ~100%");
+
+    const totalAmount = breakdown.reduce((sum, item) => sum + item.amount, 0);
+    assert.ok(totalAmount > 2000, "September expense total must be calculated accurately");
+  });
+
+  await t.test("Financial health score is within valid range", () => {
+    const { score, status, breakdown } = TWINFIN_DATA.financialHealth;
+    assert.ok(score >= 0 && score <= 100, "Health score must be between 0 and 100");
+    assert.ok(["Excellent", "Good", "Fair", "Needs Attention"].includes(status));
+    assert.ok(breakdown.length >= 5, "Must provide detailed health metric breakdown");
+    breakdown.forEach((metric) => {
+      assert.ok(metric.value >= 0 && metric.value <= 100, `${metric.label} score must be 0-100`);
+    });
+  });
+
+  await t.test("Emergency fund coverage meets baseline safety threshold", () => {
+    const emergencyFund = TWINFIN_DATA.financialHealth.breakdown.find(
+      (m) => m.label === "Emergency Fund"
+    );
+    assert.ok(emergencyFund, "Emergency Fund metric must exist");
+    assert.ok(emergencyFund.value >= 80, "Emergency fund score must achieve baseline threshold of 80");
+  });
+
+  await t.test("Savings allocation percentages sum exactly to 100%", () => {
+    const allocations = TWINFIN_DATA.savingsAllocation;
+    assert.ok(Array.isArray(allocations), "Savings allocation must be an array");
+    const totalPct = allocations.reduce((sum, item) => sum + item.pct, 0);
+    assert.equal(totalPct, 100, "Savings allocation percentages must total 100%");
+    const totalAmount = allocations.reduce((sum, item) => sum + item.amount, 0);
+    assert.ok(totalAmount > 1000, "Total allocated savings amount should exceed $1000");
+  });
+
+  await t.test("Spending category actual vs budget arrays align properly", () => {
+    const { labels, actual, budget } = TWINFIN_DATA.spendingByCategory;
+    assert.equal(labels.length, actual.length, "Actual spending items must match category labels");
+    assert.equal(labels.length, budget.length, "Budget items must match category labels");
+    for (let i = 0; i < actual.length; i++) {
+      assert.ok(actual[i] >= 0, `${labels[i]} actual spend must be non-negative`);
+      assert.ok(budget[i] > 0, `${labels[i]} budget must be positive`);
+    }
+  });
+
+  await t.test("Budget guardrails: monthly spending does not exceed monthly income", () => {
+    const { income, expenses } = TWINFIN_DATA.cashflow;
+    const avgIncome = income.reduce((a, b) => a + b, 0) / income.length;
+    const avgExpenses = expenses.reduce((a, b) => a + b, 0) / expenses.length;
+    assert.ok(avgIncome > avgExpenses, "Average income must safely surpass average monthly expenditures");
+    const savingsRatio = (avgIncome - avgExpenses) / avgIncome;
+    assert.ok(savingsRatio >= 0.20, "Savings ratio must be at least 20% to satisfy budget guardrail");
+  });
+});
+
